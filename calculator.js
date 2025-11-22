@@ -85,6 +85,7 @@ function calculateMasteryTime() {
  * Calculate rank progression
  */
 function calculateRank() {
+    const currentRankInput = document.getElementById('currentRank').value;
     const playerMasteryBase = parseFloat(document.getElementById('playerMastery').value) || 0;
     const playerMasterySuffix = parseFloat(document.getElementById('playerMasterySuffix').value) || 1;
     const playerMastery = playerMasteryBase * playerMasterySuffix;
@@ -95,8 +96,35 @@ function calculateRank() {
         return;
     }
 
-    // Get rank information
-    const rankInfo = getRankInfo(playerMastery);
+    // Get rank information - use manual input if provided, otherwise auto-detect
+    let rankInfo;
+    if (currentRankInput !== '' && currentRankInput !== null) {
+        const manualRank = parseInt(currentRankInput);
+        if (manualRank < 0 || manualRank > RANK.MAX) {
+            showResult('rankResult', `<p style="color: var(--error);">Rank must be between 0 and ${RANK.MAX}.</p>`);
+            return;
+        }
+        // Create custom rank info based on manual input
+        const currentBuff = RANK.getBuff(manualRank);
+        const nextRank = manualRank < RANK.MAX ? manualRank + 1 : null;
+        const nextBuff = nextRank !== null ? RANK.getBuff(nextRank) : null;
+        const nextRequirement = nextRank !== null ? RANK.getRequirement(nextRank) : null;
+        const masteryToNext = nextRequirement !== null ? Math.max(0, nextRequirement - playerMastery) : 0;
+
+        rankInfo = {
+            currentRank: manualRank,
+            currentBuff,
+            nextRank,
+            nextBuff,
+            nextRequirement,
+            masteryToNext,
+            currentMastery: playerMastery
+        };
+    } else {
+        // Auto-detect rank from mastery
+        rankInfo = getRankInfo(playerMastery);
+    }
+
     const allRanks = getAllRanks(playerMastery);
 
     // Build rank list HTML
