@@ -16,6 +16,41 @@ const NUMBER_SUFFIXES = Object.freeze([
     "Und", "Duo", "Tri", "Qua", "Qui", "Six", "Sep", "Oct", "Nuo"
 ]);
 
+// Suffix multipliers for parsing input
+const SUFFIX_MULTIPLIERS = {
+    "": 1,
+    "K": 1000,
+    "M": 1000000,
+    "B": 1000000000,
+    "T": 1000000000000,
+    "Qa": 1000000000000000,
+    "Qi": 1e18,
+    "Sx": 1e21,
+    "Sp": 1e24,
+    "Oc": 1e27,
+    "No": 1e30,
+    "Dc": 1e33,
+    "Ud": 1e36,
+    "Dd": 1e39,
+    "Td": 1e42,
+    "Qad": 1e45,
+    "Qid": 1e48,
+    "Sxd": 1e51,
+    "Spd": 1e54,
+    "Ocd": 1e57,
+    "Nod": 1e60,
+    "Dec": 1e63,
+    "Und": 1e66,
+    "Duo": 1e69,
+    "Tri": 1e72,
+    "Qua": 1e75,
+    "Qui": 1e78,
+    "Six": 1e81,
+    "Sep": 1e84,
+    "Oct": 1e87,
+    "Nuo": 1e90
+};
+
 // Rank system from Rankup.lua
 const RANK = {
     MAX: 36,
@@ -54,7 +89,8 @@ function toText(num, precision = 2) {
         return num.toFixed(precision);
     }
 
-    const suffix = NUMBER_SUFFIXES[tier] || `e+${tier}`;
+    // Use suffix from array if within bounds, otherwise use scientific notation
+    const suffix = tier < NUMBER_SUFFIXES.length ? NUMBER_SUFFIXES[tier] : `e+${tier}`;
     const scaled = num / Math.pow(1000, tier);
     let formatted = scaled.toFixed(precision);
 
@@ -67,49 +103,16 @@ function toText(num, precision = 2) {
 }
 
 /**
- * Calculate weapon mastery
- * @param {number} baseValue - Base value
- * @param {number} multiplier - Multiplier value
- * @returns {number} Calculated mastery
+ * Parse number with suffix from input field and suffix dropdown
+ * @param {string} inputId - ID of the number input field
+ * @param {string} suffixId - ID of the suffix dropdown
+ * @returns {number} Parsed number value
  */
-function getWeaponMastery(baseValue, multiplier) {
-    if (baseValue && multiplier !== null && multiplier !== undefined) {
-        return baseValue * (multiplier + 1);
-    }
-    return 0;
-}
-
-/**
- * Calculate required exp for star level
- * @param {number} level - Star level
- * @param {number} rarityOrder - Rarity order
- * @returns {number} Required experience
- */
-function starRequiredExp(level, rarityOrder) {
-    if (level) {
-        return Math.pow(level, 1.1) * (level + 1) * rarityOrder * 10;
-    }
-    return 0;
-}
-
-/**
- * Get star level from experience
- * @param {number} exp - Current experience
- * @param {number} rarityOrder - Rarity order
- * @returns {number} Star level
- */
-function getStarLevel(exp, rarityOrder) {
-    if (!exp) return 0;
-
-    let totalExp = 0;
-    let level = 0;
-
-    while (totalExp <= exp && level < CONSTANTS.STAR_LEVEL_CAP) {
-        level++;
-        totalExp = starRequiredExp(level, rarityOrder);
-    }
-
-    return level;
+function parseNumberWithSuffix(inputId, suffixId) {
+    const value = parseFloat(document.getElementById(inputId).value) || 0;
+    const suffix = document.getElementById(suffixId).value;
+    const multiplier = SUFFIX_MULTIPLIERS[suffix] || 1;
+    return value * multiplier;
 }
 
 /**
