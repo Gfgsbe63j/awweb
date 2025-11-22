@@ -14,15 +14,9 @@ document.getElementById('clickSpeed').addEventListener('change', function() {
  * Calculate mastery farming time
  */
 function calculateMasteryTime() {
-    // Get input values with suffix multipliers
-    const currentMasteryBase = parseFloat(document.getElementById('currentMastery').value) || 0;
-    const currentMasterySuffix = parseFloat(document.getElementById('currentMasterySuffix').value) || 1;
-    const currentMastery = currentMasteryBase * currentMasterySuffix;
-
-    const targetMasteryBase = parseFloat(document.getElementById('targetMastery').value) || 0;
-    const targetMasterySuffix = parseFloat(document.getElementById('targetMasterySuffix').value) || 1;
-    const targetMastery = targetMasteryBase * targetMasterySuffix;
-
+    // Get input values
+    const currentMastery = parseFloat(document.getElementById('currentMastery').value) || 0;
+    const targetMastery = parseFloat(document.getElementById('targetMastery').value) || 0;
     const masteryPerClick = parseFloat(document.getElementById('masteryPerClick').value) || 1;
     const clickSpeed = document.getElementById('clickSpeed').value;
     const customClickRate = parseFloat(document.getElementById('customClickRate').value) || 10;
@@ -53,10 +47,6 @@ function calculateMasteryTime() {
     const html = `
         <h3>Farming Time Results</h3>
         <div class="result-item">
-            <span class="result-label">Click Speed:</span>
-            <span class="result-value">${clicksPerSecond.toFixed(2)} clicks/sec</span>
-        </div>
-        <div class="result-item">
             <span class="result-label">Mastery Needed:</span>
             <span class="result-value">${toText(result.masteryNeeded)}</span>
         </div>
@@ -85,46 +75,17 @@ function calculateMasteryTime() {
  * Calculate rank progression
  */
 function calculateRank() {
-    const currentRankInput = document.getElementById('currentRank').value;
-    const playerMasteryBase = parseFloat(document.getElementById('playerMastery').value) || 0;
-    const playerMasterySuffix = parseFloat(document.getElementById('playerMasterySuffix').value) || 1;
-    const playerMastery = playerMasteryBase * playerMasterySuffix;
+    const currentRank = parseInt(document.getElementById('currentRank').value) || 0;
+    const playerMastery = parseFloat(document.getElementById('playerMastery').value) || 0;
 
     // Validate inputs
-    if (playerMastery < 0) {
-        showResult('rankResult', '<p style="color: var(--error);">Mastery cannot be negative.</p>');
+    if (currentRank < 0 || currentRank > RANK.MAX) {
+        showResult('rankResult', `<p style="color: var(--error);">Rank must be between 0 and ${RANK.MAX}.</p>`);
         return;
     }
 
-    // Get rank information - use manual input if provided, otherwise auto-detect
-    let rankInfo;
-    if (currentRankInput !== '' && currentRankInput !== null) {
-        const manualRank = parseInt(currentRankInput);
-        if (manualRank < 0 || manualRank > RANK.MAX) {
-            showResult('rankResult', `<p style="color: var(--error);">Rank must be between 0 and ${RANK.MAX}.</p>`);
-            return;
-        }
-        // Create custom rank info based on manual input
-        const currentBuff = RANK.getBuff(manualRank);
-        const nextRank = manualRank < RANK.MAX ? manualRank + 1 : null;
-        const nextBuff = nextRank !== null ? RANK.getBuff(nextRank) : null;
-        const nextRequirement = nextRank !== null ? RANK.getRequirement(nextRank) : null;
-        const masteryToNext = nextRequirement !== null ? Math.max(0, nextRequirement - playerMastery) : 0;
-
-        rankInfo = {
-            currentRank: manualRank,
-            currentBuff,
-            nextRank,
-            nextBuff,
-            nextRequirement,
-            masteryToNext,
-            currentMastery: playerMastery
-        };
-    } else {
-        // Auto-detect rank from mastery
-        rankInfo = getRankInfo(playerMastery);
-    }
-
+    // Get rank information
+    const rankInfo = getRankInfo(playerMastery);
     const allRanks = getAllRanks(playerMastery);
 
     // Build rank list HTML
@@ -197,6 +158,109 @@ function calculateRank() {
     const html = currentRankHTML + nextRankHTML + '<h3 style="margin-top: 30px;">All Ranks</h3>' + rankListHTML;
 
     showResult('rankResult', html);
+}
+
+/**
+ * Calculate star level from experience
+ */
+function calculateStarLevel() {
+    const starExp = parseFloat(document.getElementById('starExp').value) || 0;
+    const rarityOrder = parseInt(document.getElementById('rarityOrder').value) || 1;
+
+    // Validate inputs
+    if (starExp < 0) {
+        showResult('starResult', '<p style="color: var(--error);">Star experience cannot be negative.</p>');
+        return;
+    }
+
+    if (rarityOrder < 1 || rarityOrder > 10) {
+        showResult('starResult', '<p style="color: var(--error);">Rarity order must be between 1 and 10.</p>');
+        return;
+    }
+
+    // Calculate star level
+    const level = getStarLevel(starExp, rarityOrder);
+    const currentLevelExp = starRequiredExp(level, rarityOrder);
+    const nextLevelExp = level < CONSTANTS.STAR_LEVEL_CAP ? starRequiredExp(level + 1, rarityOrder) : null;
+    const expToNext = nextLevelExp ? nextLevelExp - starExp : 0;
+
+    // Display results
+    let html = `
+        <h3>Star Level Results</h3>
+        <div class="result-item">
+            <span class="result-label">Current Level:</span>
+            <span class="result-value highlight">${level}</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">Current Experience:</span>
+            <span class="result-value">${toText(starExp)}</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">Experience for Current Level:</span>
+            <span class="result-value">${toText(currentLevelExp)}</span>
+        </div>
+    `;
+
+    if (level < CONSTANTS.STAR_LEVEL_CAP) {
+        html += `
+            <div class="result-item">
+                <span class="result-label">Experience for Next Level:</span>
+                <span class="result-value">${toText(nextLevelExp)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Experience Needed:</span>
+                <span class="result-value warning">${toText(expToNext)}</span>
+            </div>
+        `;
+    } else {
+        html += `
+            <p style="color: var(--success); text-align: center; padding: 10px; margin-top: 10px;">
+                Maximum star level reached!
+            </p>
+        `;
+    }
+
+    showResult('starResult', html);
+}
+
+/**
+ * Calculate weapon mastery
+ */
+function calculateWeaponMastery() {
+    const baseValue = parseFloat(document.getElementById('baseValue').value) || 0;
+    const multiplier = parseFloat(document.getElementById('multiplier').value) || 0;
+
+    // Validate inputs
+    if (baseValue < 0 || multiplier < 0) {
+        showResult('weaponResult', '<p style="color: var(--error);">Values cannot be negative.</p>');
+        return;
+    }
+
+    // Calculate weapon mastery
+    const mastery = getWeaponMastery(baseValue, multiplier);
+
+    // Display results
+    const html = `
+        <h3>Weapon Mastery Results</h3>
+        <div class="result-item">
+            <span class="result-label">Base Value:</span>
+            <span class="result-value">${toText(baseValue)}</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">Multiplier:</span>
+            <span class="result-value">${toText(multiplier)}</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">Total Mastery:</span>
+            <span class="result-value highlight">${toText(mastery)}</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">Formula:</span>
+            <span class="result-value" style="font-size: 0.9rem;">Base × (Multiplier + 1)</span>
+        </div>
+    `;
+
+    showResult('weaponResult', html);
 }
 
 /**
