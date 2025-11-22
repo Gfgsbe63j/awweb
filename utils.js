@@ -1,11 +1,11 @@
 // Anime Weapons Utility Functions
 // Translated from Utils.lua
 
-// Constants from CONSTANTS.lua and click.lua
+// Constants from CONSTANTS.lua
 const CONSTANTS = {
-    FAST_CLICK_DEBOUNCE: 0.15,    // From CONSTANTS.lua - Fast manual click
-    NORMAL_CLICK_DEBOUNCE: 0.2,   // From CONSTANTS.lua - Normal manual click
-    AUTO_CLICK_DEBOUNCE: 0.03,    // From click.lua line 42 - Auto-click debounce
+    FAST_CLICK_DEBOUNCE: 0.15,
+    NORMAL_CLICK_DEBOUNCE: 0.2,
+    AUTO_CLICK_DEBOUNCE: 0.03,
     STAR_LEVEL_CAP: 50,
 };
 
@@ -161,21 +161,13 @@ function formatCounter(seconds) {
  * @param {string} type - Click type ('auto', 'fast', 'normal', or 'custom')
  * @param {number} customValue - Custom clicks per second (if type is 'custom')
  * @returns {number} Clicks per second
- *
- * Click speeds based on game code:
- * - Auto: 33.33 clicks/sec (0.03s debounce from click.lua:42)
- * - Fast: 6.67 clicks/sec (0.15s debounce from CONSTANTS.lua)
- * - Normal: 5 clicks/sec (0.2s debounce from CONSTANTS.lua)
- *
- * Note: These are theoretical maximum speeds. Actual in-game performance
- * may vary due to network latency and server processing.
  */
 function getClicksPerSecond(type, customValue = 1) {
     switch (type) {
         case 'auto':
-            return 1 / CONSTANTS.AUTO_CLICK_DEBOUNCE; // ~33.33 clicks/sec
+            return 1 / CONSTANTS.AUTO_CLICK_DEBOUNCE; // 33.33 clicks/sec
         case 'fast':
-            return 1 / CONSTANTS.FAST_CLICK_DEBOUNCE; // ~6.67 clicks/sec
+            return 1 / CONSTANTS.FAST_CLICK_DEBOUNCE; // 6.67 clicks/sec
         case 'normal':
             return 1 / CONSTANTS.NORMAL_CLICK_DEBOUNCE; // 5 clicks/sec
         case 'custom':
