@@ -75,12 +75,11 @@ function calculateMasteryTime() {
  * Calculate rank progression
  */
 function calculateRank() {
-    const currentRank = parseInt(document.getElementById('currentRank').value) || 0;
     const playerMastery = parseNumberWithSuffix('playerMastery', 'playerMasterySuffix');
 
     // Validate inputs
-    if (currentRank < 0 || currentRank > RANK.MAX) {
-        showResult('rankResult', `<p style="color: var(--error);">Rank must be between 0 and ${RANK.MAX}.</p>`);
+    if (playerMastery < 0) {
+        showResult('rankResult', '<p style="color: var(--error);">Mastery cannot be negative.</p>');
         return;
     }
 
