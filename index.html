@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Weapons Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Anime Weapons Calculator</h1>
+            <p class="subtitle">Calculate your farming progress and rank requirements</p>
+        </header>
+
+        <main>
+            <!-- Mastery Farming Calculator -->
+            <section class="calculator-card">
+                <h2>Mastery Farming Calculator</h2>
+                <p class="description">Calculate how long it takes to farm mastery</p>
+
+                <div class="form-group">
+                    <label for="currentMastery">Current Mastery</label>
+                    <input type="number" id="currentMastery" placeholder="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="targetMastery">Target Mastery</label>
+                    <input type="number" id="targetMastery" placeholder="30000" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="masteryPerClick">Mastery Per Click</label>
+                    <input type="number" id="masteryPerClick" placeholder="1" min="0" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="clickSpeed">Click Speed</label>
+                    <select id="clickSpeed">
+                        <option value="auto">Auto Click (33.33 clicks/sec)</option>
+                        <option value="fast">Fast Click (6.67 clicks/sec)</option>
+                        <option value="normal">Normal Click (5 clicks/sec)</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="customClickGroup" style="display: none;">
+                    <label for="customClickRate">Custom Clicks Per Second</label>
+                    <input type="number" id="customClickRate" placeholder="10" min="0.1" step="0.1">
+                </div>
+
+                <button class="btn-primary" onclick="calculateMasteryTime()">Calculate Time</button>
+
+                <div id="masteryResult" class="result"></div>
+            </section>
+
+            <!-- Rank Calculator -->
+            <section class="calculator-card">
+                <h2>Rank Calculator</h2>
+                <p class="description">Check mastery requirements and buffs for each rank</p>
+
+                <div class="form-group">
+                    <label for="currentRank">Current Rank</label>
+                    <input type="number" id="currentRank" placeholder="0" min="0" max="36">
+                </div>
+
+                <div class="form-group">
+                    <label for="playerMastery">Your Total Mastery</label>
+                    <input type="number" id="playerMastery" placeholder="0" min="0">
+                </div>
+
+                <button class="btn-primary" onclick="calculateRank()">Calculate Rank</button>
+
+                <div id="rankResult" class="result"></div>
+            </section>
+
+            <!-- Star Level Calculator -->
+            <section class="calculator-card">
+                <h2>Star Level Calculator</h2>
+                <p class="description">Calculate star level from experience</p>
+
+                <div class="form-group">
+                    <label for="starExp">Star Experience</label>
+                    <input type="number" id="starExp" placeholder="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="rarityOrder">Rarity Order (1-10)</label>
+                    <input type="number" id="rarityOrder" placeholder="1" min="1" max="10">
+                </div>
+
+                <button class="btn-primary" onclick="calculateStarLevel()">Calculate Level</button>
+
+                <div id="starResult" class="result"></div>
+            </section>
+
+            <!-- Weapon Mastery Calculator -->
+            <section class="calculator-card">
+                <h2>Weapon Mastery Calculator</h2>
+                <p class="description">Calculate weapon mastery from base stats</p>
+
+                <div class="form-group">
+                    <label for="baseValue">Base Value</label>
+                    <input type="number" id="baseValue" placeholder="100" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="multiplier">Multiplier</label>
+                    <input type="number" id="multiplier" placeholder="0" min="0">
+                </div>
+
+                <button class="btn-primary" onclick="calculateWeaponMastery()">Calculate Mastery</button>
+
+                <div id="weaponResult" class="result"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Anime Weapons Calculator &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script src="utils.js"></script>
+    <script src="calculator.js"></script>
+</body>
+</html>
