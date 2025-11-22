@@ -98,6 +98,20 @@ main {
     font-weight: 500;
 }
 
+.input-with-suffix {
+    display: flex;
+    gap: 10px;
+}
+
+.input-with-suffix input {
+    flex: 1;
+}
+
+.suffix-select {
+    width: 90px;
+    flex-shrink: 0;
+}
+
 .form-group input,
 .form-group select {
     width: 100%;
